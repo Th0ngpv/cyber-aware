@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//
+// =============================
+// MODELS
+// =============================
+//
+
+// 👤 USER — supports Google login and progress tracking
+model User {
+  id         String   @id @default(cuid())
+  name       String?
+  email      String   @unique
+  image      String? // Google profile picture
+  provider   String? // "google" | "email"
+  providerId String? // Google user ID
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  progresses  UserProgress[]
+  quizResults QuizResult[]
+}
+
+// 📘 LESSON — divided into multiple LessonPages
+model Lesson {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  pages      LessonPage[]
+  quizzes    Quiz[]
+  progresses UserProgress[]
+}
+
+// 📄 LESSON PAGE — each page can contain interactive HTML + animations
+model LessonPage {
+  id       String @id @default(cuid())
+  title    String
+  order    Int
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id])
+
+  // JSON structure containing blocks or components (Framer Motion, Tailwind)
+  blocks Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 🧠 QUIZ — attached to a lesson
+model Quiz {
+  id       String       @id @default(cuid())
+  question String
+  options  Json
+  answer   String
+  lessonId String
+  lesson   Lesson       @relation(fields: [lessonId], references: [id])
+  results  QuizResult[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 🏆 QUIZ RESULT — stores user’s quiz answers and scores
+model QuizResult {
+  id        String   @id @default(cuid())
+  quizId    String
+  userId    String
+  score     Int
+  createdAt DateTime @default(now())
+
+  quiz Quiz @relation(fields: [quizId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+}
+
+// 📊 USER PROGRESS — tracks per-user progress in lessons and pages
+model UserProgress {
+  id           String   @id @default(cuid())
+  userId       String
+  lessonId     String
+  currentPage  Int // current page number in lesson
+  completed    Boolean  @default(false)
+  score        Int? // optional, if tied to quizzes
+  lastAccessed DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+
+  @@unique([userId, lessonId]) // Prevent duplicate progress tracking for same user+lesson
+}
