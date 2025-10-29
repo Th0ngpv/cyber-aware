@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "Lesson" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "LessonPage" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "emailVerified" TIMESTAMP(3);
