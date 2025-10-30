@@ -7,17 +7,15 @@ import LogoutButton from "@/components/LogoutButton";
 import Link from "next/link";
 
 export default async function HomePage() {
-  // 1. Get current session
   const session = await getServerSession(authOptions);
 
-  // If not logged in, show login prompt
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <p>Please log in to access lessons and rankings.</p>
+        <p className="text-lg">Please log in to access lessons and rankings.</p>
         <Link
           href="/login"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition"
         >
           Login
         </Link>
@@ -25,12 +23,10 @@ export default async function HomePage() {
     );
   }
 
-  // 2. Fetch lessons
   const lessons: Lesson[] = await prisma.lesson.findMany({
     orderBy: { createdAt: "asc" },
   });
 
-  // 3. Fetch leaderboard
   const rankings: (UserRanking & { user: { name: string | null } })[] =
     await prisma.userRanking.findMany({
       orderBy: { totalScore: "desc" },
@@ -38,7 +34,7 @@ export default async function HomePage() {
     });
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Cyber Aware Dashboard</h1>
@@ -47,18 +43,20 @@ export default async function HomePage() {
 
       {/* Lessons Section */}
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Lessons</h2>
-        <div className="grid gap-4 md:grid-cols-2">
+        <h2 className="text-2xl font-semibold mb-6">Lessons</h2>
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {lessons.map((lesson) => (
             <div
               key={lesson.id}
-              className="p-4 border rounded shadow hover:shadow-lg transition"
+              className="flex flex-col justify-between p-5 border rounded-xl shadow-md hover:shadow-xl hover:scale-105 transition-transform "
             >
-              <h3 className="text-xl font-semibold">{lesson.title}</h3>
-              <p className="text-gray-600">{lesson.description}</p>
+              <div>
+                <h3 className="text-xl font-semibold mb-2">{lesson.title}</h3>
+                <p className="text-gray-600 mb-4 line-clamp-3">{lesson.description}</p>
+              </div>
               <Link
-                href={`/lessons/${lesson.slug}/page`}
-                className="mt-2 inline-block text-white bg-blue-600 px-4 py-2 rounded"
+                href={`/lessons/${lesson.slug}`}
+                className="mt-auto text-center bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition"
               >
                 Start Lesson
               </Link>
@@ -79,7 +77,7 @@ export default async function HomePage() {
               <span>
                 {index + 1}. {rank.user.name || "Anonymous"}
               </span>
-              <span>{rank.totalScore} pts</span>
+              <span className="font-medium">{rank.totalScore} pts</span>
             </div>
           ))}
         </div>
