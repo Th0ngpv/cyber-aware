@@ -1,42 +1,35 @@
-"use client";
+// src/app/lessons/[slug]/quiz/page.jsx
+import QuizList from "@/components/QuizList";
+import { prisma } from "@/lib/prisma";
 
-import { useState } from "react";
+export default async function LessonQuizPage({ params }) {
+  // In Next.js 13+, params is usually a Promise
+  const { slug } = await params;
 
-export default function QuizPage({ params }) {
-  const { slug } = params;
-  const [submitted, setSubmitted] = useState(false);
-  const [answer, setAnswer] = useState("");
+  if (!slug) return <div>Missing lesson slug</div>;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
+  const lesson = await prisma.lesson.findUnique({
+    where: { slug },
+    include: { quizzes: true },
+  });
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Quiz for {slug}</h1>
+  if (!lesson) return <div>Lesson not found</div>;
 
-      {!submitted ? (
-        <form onSubmit={handleSubmit}>
-          <label className="block mb-2">
-            Your Answer:
-            <input
-              type="text"
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              className="border p-2 w-full mt-1"
-            />
-          </label>
-          <button
-            type="submit"
-            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            Submit
-          </button>
-        </form>
-      ) : (
-        <p className="text-green-600">Thanks! Your answer has been submitted.</p>
-      )}
-    </div>
-  );
+  // Normalize quizzes so options are objects with `text`
+  const quizzes = lesson.quizzes.map((q) => ({
+    id: q.id,
+    question: q.question,
+    answer: q.answer,
+    createdAt: q.createdAt.toISOString(),
+    updatedAt: q.updatedAt.toISOString(),
+    options: Array.isArray(q.options)
+      ? q.options.map((opt) =>
+          typeof opt === "object" && opt !== null && "text" in opt
+            ? { text: String(opt.text) }
+            : { text: String(opt) }
+        )
+      : [],
+  }));
+
+  return <QuizList quizzes={quizzes} />;
 }
