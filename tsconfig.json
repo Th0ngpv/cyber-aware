@@ -35,7 +35,7 @@
     "types/**/*.d.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
-  ],
+, "src/app/lessons/[slug]/quiz/page.jsx", "src/app/api/lessons/[slug]/quiz/submit/route.js"  ],
   "exclude": [
     "node_modules"
   ]

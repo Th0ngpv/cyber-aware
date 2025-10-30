@@ -1,17 +1,24 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const { data: session } = useSession();
+  const router = useRouter();
+
+  // Redirect to dashboard if logged in
+  useEffect(() => {
+    if (session) {
+      router.push("/"); // redirect to dashboard
+    }
+  }, [session, router]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-4">
       {session ? (
-        <>
-          <p>Signed in as {session.user?.email}</p>
-          <button onClick={() => signOut()}>Sign Out</button>
-        </>
+        <p>Redirecting...</p>
       ) : (
         <>
           <button

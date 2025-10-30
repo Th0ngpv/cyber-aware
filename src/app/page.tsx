@@ -1,65 +1,89 @@
-import Image from "next/image";
+// src/app/page.tsx
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Lesson, UserRanking } from "@prisma/client";
+import LogoutButton from "@/components/LogoutButton";
+import Link from "next/link";
 
-export default function Home() {
+export default async function HomePage() {
+  // 1. Get current session
+  const session = await getServerSession(authOptions);
+
+  // If not logged in, show login prompt
+  if (!session) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <p>Please log in to access lessons and rankings.</p>
+        <Link
+          href="/login"
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Login
+        </Link>
+      </div>
+    );
+  }
+
+  // 2. Fetch lessons
+  const lessons: Lesson[] = await prisma.lesson.findMany({
+    orderBy: { createdAt: "asc" },
+  });
+
+  // 3. Fetch leaderboard
+  const rankings: (UserRanking & { user: { name: string | null } })[] =
+    await prisma.userRanking.findMany({
+      orderBy: { totalScore: "desc" },
+      include: { user: true },
+    });
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="p-6 max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Cyber Aware Dashboard</h1>
+        <LogoutButton />
+      </div>
+
+      {/* Lessons Section */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-4">Lessons</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          {lessons.map((lesson) => (
+            <div
+              key={lesson.id}
+              className="p-4 border rounded shadow hover:shadow-lg transition"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              <h3 className="text-xl font-semibold">{lesson.title}</h3>
+              <p className="text-gray-600">{lesson.description}</p>
+              <Link
+                href={`/lessons/${lesson.slug}/page`}
+                className="mt-2 inline-block text-white bg-blue-600 px-4 py-2 rounded"
+              >
+                Start Lesson
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Leaderboard Section */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Leaderboard</h2>
+        <div className="grid gap-2">
+          {rankings.map((rank, index) => (
+            <div
+              key={rank.id}
+              className="flex justify-between p-2 border rounded"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <span>
+                {index + 1}. {rank.user.name || "Anonymous"}
+              </span>
+              <span>{rank.totalScore} pts</span>
+            </div>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </section>
     </div>
   );
 }
