@@ -47,30 +47,30 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const lesson: LessonType = await res.json();
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* Back to Dashboard Button */}
-      <div>
+    <div className="max-w-4xl mx-auto ">
+      {/* ===== Top Navigation Buttons ===== */}
+      <div className="flex justify-between items-center mt-1.5">
+        {/* Back to Dashboard Button */}
         <Link
           href="/"
-          className="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded transition"
+          className="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg transition"
         >
           ← Back to Dashboard
         </Link>
-      </div>
 
-      <LessonPageViewer initialLesson={lesson} />
-
-      {/* Show Quiz Button if there are quizzes */}
-      {lesson.quizzes.length > 0 && (
-        <div className="mt-6 text-center">
+        {/* Show Quiz Button if quizzes exist */}
+        {lesson.quizzes.length > 0 && (
           <Link
             href={`/lessons/${lesson.slug}/quiz`}
-            className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-3 rounded-lg transition"
+            className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg transition"
           >
-            Go to Quiz
+            Go to Quiz →
           </Link>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* ===== Lesson Viewer ===== */}
+      <LessonPageViewer initialLesson={lesson} />
     </div>
   );
 }

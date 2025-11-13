@@ -39,9 +39,11 @@ export default function QuizList({ quizzes }: QuizListProps) {
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold mb-4">Quiz</h1>
+
       <h2 className="text-xl font-semibold mb-2">
         Question {currentQuizIndex + 1}: {quiz.question}
       </h2>
+
       <div className="flex flex-col gap-2 mb-4">
         {quiz.options.map((opt: QuizOption) => (
           <button
@@ -60,6 +62,7 @@ export default function QuizList({ quizzes }: QuizListProps) {
           </button>
         ))}
       </div>
+
       {selectedOption && currentQuizIndex < quizzes.length - 1 && (
         <button
           onClick={handleNext}
@@ -68,6 +71,7 @@ export default function QuizList({ quizzes }: QuizListProps) {
           Next Question
         </button>
       )}
+      
       {selectedOption && currentQuizIndex === quizzes.length - 1 && (
         <p className="text-lg font-semibold">
           Quiz Completed! Your score: {score}/{quizzes.length}
