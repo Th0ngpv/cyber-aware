@@ -49,16 +49,35 @@ async function main() {
             title: "Recognizing Phishing Emails",
             content: {
               html: `
-                <h2>Spot a Fake Email</h2>
-                <p>Always check the sender's email and links before clicking.</p>
-                <div style="border:1px solid #ccc; padding:10px;">
-                  <p><b>From:</b> security@bank-fake.com</p>
-                  <p><b>Subject:</b> Urgent: Verify Your Account</p>
-                  <p>Do NOT click suspicious links!</p>
-                </div>
-              `,
+                    <h2>Spot a Fake Email</h2>
+                    <p>Phishing emails often look professional but contain subtle signs of fraud. Carefully inspect sender details, tone, and links before clicking anything.</p>
+
+                    <div style="border:1px solid #ccc; border-radius:8px; padding:16px; margin-top:12px; background:white; font-family:Arial, sans-serif;color: black;">
+                      <div style="display:flex; align-items:center; margin-bottom:8px;">
+                        <img src="https://i.pravatar.cc/40?u=bank-fake" alt="avatar" style="width:40px; height:40px; border-radius:50%; margin-right:10px;">
+                        <div>
+                          <div style="font-weight:bold; color:black;">Bank Secure Team</div>
+                          <div style="color:#555; font-size:0.9rem;">security@bank-fake.com</div>
+                        </div>
+                        <div style="margin-left:auto; color:#888; font-size:0.85rem;">10:14 AM (1 hour ago)</div>
+                      </div>
+                      <hr style="border:none; border-top:1px solid #e0e0e0; margin:8px 0;">
+                      <div style="margin-bottom:12px;">
+                        <p><strong>Subject:</strong> ⚠️ Urgent: Verify Your Account Immediately</p>
+                        <p>Dear Customer,<br>
+                        We detected unusual activity on your account. Please verify your login information immediately to avoid suspension.</p>
+                        <p><a href="#" style="color:#1a73e8; text-decoration:none;">Verify Now</a></p>
+                      </div>
+                      <div style="border-top:1px dashed #ccc; padding-top:8px; color:#888; font-size:0.85rem;">
+                        Do not reply to this message. This mailbox is not monitored.
+                      </div>
+                    </div>
+
+                    <p style="margin-top:12px;">🕵️‍♀️ <b>Tip:</b> Notice that the sender address <code>security@bank-fake.com</code> looks suspicious and the message urges immediate action — both are red flags of phishing.</p>
+                  `,
             },
-          },
+          }
+
         ],
       },
     },
